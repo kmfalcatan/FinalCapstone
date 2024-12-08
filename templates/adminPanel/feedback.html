@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+
+    <link rel="stylesheet" href="{% static 'css/feedback.css' %}">
+    <link rel="stylesheet" href="{% static 'css/exploreCourses.css' %}">
+</head>
+<body style="background-color: rgb(240,240,240);">
+    <div class="container" style="background-color: rgb(240,240,240);">
+        <div class="headerContainer">
+            <div class='menubarContainer' onclick='toggleMenu(this)'>
+                <div class='line' style="border: solid rgb(72,72,72) 2px;"></div>
+                <div class='line' style="border: solid rgb(72,72,72) 2px;"></div>
+                <div class='line' style="border: solid rgb(72,72,72) 2px;"></div>
+            </div>
+        </div>
+
+        <div style="background-color: rgb(240,240,240); z-index: 1;" class="subMenubarContainer">
+            <a href="{% url 'dashboardAdmin' %}">
+                <div class="barContainer">
+                    <p>Dashboard</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'adminPanel' %}">
+                <div class="barContainer">
+                    <p>List of teachers</p>
+                </div>
+            </a>
+
+            <a href="{% url 'course' %}">
+                <div class="barContainer">
+                    <p>List of courses</p>
+                </div>
+            </a>
+
+            <a href="{% url 'feedback' %}">
+                <div class="barContainer">
+                    <p>List of feedback</p>
+                </div>
+            </a>
+
+            <a href="{% url 'adminSetting' %}">
+                <div class="barContainer">
+                    <p>Setting</p>
+                </div>
+            </a>
+
+            <a href="{% url 'logout' %}">
+                <div class="barContainer1">
+                    <p>Logout</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="filterContainer">
+            <div class="textContainer">
+                <p style="color: rgb(72,72,72);">List of Feedback</p>
+            </div>
+        </div>
+
+        <div class="courseContainer5" style="display: flex; flex-wrap: wrap; gap: 2rem;">
+            {% for feedback in feedbacks %}
+            <div class="subCourseContainer5 subCourse" style="width: 18rem;">
+                <div class="courseInfoContainer5">
+                    <div class="logoContainer5">
+                        <img 
+                            style="height: 90%;" 
+                            class="logo5" 
+                            src="{% static 'img/person (1).svg' %}" 
+                            alt="{{ course.Course|escape }}">
+                    </div>
+
+                    <div class="courseNameContainer5">
+                        <p class="courseName5" style="width: 100%;">{{ feedback.Name }}</p>
+                    </div>
+    
+                    <div class="viewContainer5">
+                        <button style="margin-left: 0.5rem;" onclick="showFeedback('{{ feedback.Feedback }}')" class="viewButton">View</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="addListContainer" id="feedbackDetail" style="display: none;">
+        <div class="addListContainer" style="background-color: none;">
+            <div class="subAddListContainer">
+                <div class="closeContainer">
+                    <div class="subCloseContainer">
+                        <img onclick="closeFeedback()" class="closeButton8" src="{% static 'img/Screenshot 2024-07-17 221356.png' %}" alt="">
+                    </div>
+
+                    <div style="
+                    width: 19.6rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.6rem;
+                    font-weight: bold;
+                    padding-right: 2.5rem;">
+                        <p>Feedback</p>
+                    </div>
+                </div>
+    
+                <div class="infoContainer">
+                    <div class="subInfoContainer1" style="flex-direction: column; margin-top: 1rem;">
+                        <p style="width: 100%; justify-content: left; padding-left: 2rem;">Message:</p>
+                        <div class="info1" style="min-height: 10rem; justify-content: left; padding-left: 0.5rem;">
+                            <p id="feedbackMessage"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showFeedback(feedback) {
+            document.getElementById('feedbackMessage').innerText = feedback;
+            document.getElementById('feedbackDetail').style.display = 'block';
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedbackDetail').style.display = 'none';
+        }
+    </script>
+
+    <script src="{% static 'js/exploreCourses.js' %}"></script>
+</body>
+</html>
