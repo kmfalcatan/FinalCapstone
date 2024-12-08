@@ -1,0 +1,233 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'css/loginForm.css' %}">
+    <style>
+        .container {
+            background: url("{% static 'img/Green Watercolor Weekly Schedule Instagram Story.png' %}") center/cover no-repeat;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="subContainer">
+            <div class="headerContainer">
+                <div class="loginContainer" style="margin-right: 1rem;">
+                    <p onclick="document.querySelector('.loginFormContainer').style.display = 'block';" class="loginButton">Login</p>
+                </div>
+            </div>
+            <div class="bodyContainer" style="height: 85%;">
+                <div class="subBodyContainer">
+                    <div class="navContainer">
+                        <div class="pictureContainer">
+                            <img class="picture" src="{% static 'img/4521334.jpg' %}" alt="">
+                        </div>
+                        <div class="textContainer">
+                            <p>Find the Perfect Course for You</p>
+                        </div>
+                        <div class="buttonContainer">
+                            <a href="{% url 'exploreCourses' %}">
+                                <button class="button1">Explore Course</button>
+                            </a>
+                            
+                            <button class="button1" onclick="generateStudentID()">Get Start</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loginFormContainer" style="display: none;">
+        <div class="loginFormContainer" style="background-color: transparent;">
+            <div class="subLoginFormContainer">
+                <div class="closeContainer">
+                    <div class="subCloseContainer">
+                        <img onclick="login()" class="close" src="{% static 'img/Screenshot 2024-07-17 221356.png' %}" alt="">
+                    </div>
+                    <div class="loginTextContainer">
+                        <p>Login</p>
+                    </div>
+                </div>
+                <div class="inputContainer">
+                    <form style="width: 100%;" method="post" action="{% url 'loginForm' %}">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        <div class="subInputContainer">
+                            <input class="inputEmail" style="width: 90%;" type="email" name="email" placeholder="Email" required>
+                        </div>
+
+                        <div class="subInputContainer">
+                            <input class="inputEmail" style="width: 90%;"  type="password" name="password" placeholder="Password" required>
+                        </div>
+
+                        <div class="subInputContainer" style="height: 1rem; justify-content: left;">
+                            <p onclick="forgot()" class="forgotContainer" style="padding-left: 1rem;">Forgot password?</p>
+                        </div>
+
+                        <div class="subInputContainer">
+                            <button class="loginButton1" type="submit">Login</button>
+                        </div>
+                    </form>                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loginFormContainer forgot" style="display: none;">
+        <div class="loginFormContainer" style="background-color: transparent;">
+            <div class="subLoginFormContainer">
+                <div class="closeContainer">
+                    <div class="subCloseContainer">
+                        <img onclick="forgot()" class="close" src="{% static 'img/Screenshot 2024-07-17 221356.png' %}" alt="">
+                    </div>
+                    <div class="loginTextContainer">
+                        <p>Forgat Password</p>
+                    </div>
+                </div>
+    
+                <div class="inputContainer">
+                    <div class="subInputContainer">
+                        <input class="inputEmail" id="newPassword" type="password" placeholder="Enter your new password:" required>
+                    </div>
+    
+                    <div class="subInputContainer">
+                        <input class="inputEmail" id="confirmPassword" type="password" placeholder="Confirm your new password:" required>
+                    </div>
+    
+                    <div class="subInputContainer">
+                        <input class="inputEmail" id="otpEmail" type="email" placeholder="Enter your email to send OTP:" required>
+                    </div>
+    
+                    <div class="subInputContainer">
+                        <button class="loginButton1" onclick="sendOtp(), otp()">Send OTP</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <div class="loginFormContainer OtpContainer" style="display: none;">
+        <div class="loginFormContainer" style="background-color: transparent;">
+            <div class="subLoginFormContainer">
+                <div class="closeContainer">
+                    <div class="subCloseContainer">
+                        <img onclick="otp()" class="close" src="{% static 'img/Screenshot 2024-07-17 221356.png' %}" alt="">
+                    </div>
+                    <div class="loginTextContainer">
+                        <p>Enter the OTP NO.</p>
+                    </div>
+                </div>
+        
+                <div class="inputContainer">
+                    <div class="subInputContainer">
+                        <input class="inputEmail" id="otpCode" type="text" placeholder="Enter your OTP code:" required>
+                    </div>
+        
+                    <div class="subInputContainer">
+                        <button class="loginButton1" onclick="verifyOtp()">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <script src="{% static 'js/loginForm.js' %}"></script>
+    <script>
+        {% if messages %}
+            {% for message in messages %}
+                alert("{{ message }}");
+            {% endfor %}
+        {% endif %}
+    </script>
+
+    <script>
+        function generateStudentID() {
+            fetch("{% url 'generate_student_id' %}", {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                window.location.href = "{% url 'dashboard' %}";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+
+<script>
+    function sendOtp() {
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        const email = document.getElementById("otpEmail").value;
+
+        if (!newPassword || !confirmPassword || !email) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            alert("Passwords do not match.");
+            return;
+        }
+
+        fetch("{% url 'send_otp' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ email: email, password: newPassword }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred. Please try again.");
+        });
+    }
+
+    function verifyOtp() {
+        const otpCode = document.getElementById("otpCode").value;
+        const email = document.getElementById("otpEmail").value;
+        const newPassword = document.getElementById("newPassword").value; 
+
+        if (!otpCode || !email || !newPassword) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        fetch("{% url 'reset_password' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ email: email, otp: otpCode, new_password: newPassword }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                window.location.href = "{% url 'loginForm' %}"; 
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred. Please try again.");
+        });
+    }
+</script>
+
+</body>
+</html>

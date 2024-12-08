@@ -1,0 +1,316 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Panel</title>
+
+    <link rel="stylesheet" href="{% static 'css/exploreCourses.css' %}">
+</head>
+<body>
+    <div class="container" style="background-color: rgb(240,240,240);">
+        <div class="headerContainer">
+            <div class='menubarContainer' onclick='toggleMenu(this)'>
+                <div class='line' style="border: solid rgb(72,72,72) 2px;"></div>
+                <div class='line' style="border: solid rgb(72,72,72) 2px;"></div>
+                <div class='line' style="border: solid rgb(72,72,72) 2px;"></div>
+            </div>
+        </div>
+
+        <div class="subMenubarContainer" style="background-color: rgb(240,240,240);">
+            <a href="{% url 'logout' %}">
+                <div class="barContainer">
+                    <p>Back</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="collegeContainer" style="height: 4rem;">
+            <div style="background-color: rgb(158, 21, 21)" class="subCollegeContainer">
+                <p onclick="showAllCourses()">All</p>
+            </div>
+
+            <select style="background-color: rgb(158, 21, 21); width: 19rem;" class="subCollegeContainer1" name="" id="collegeSelect" onchange="filterCourses()">
+                <option value="all">Choose a college</option>
+                {% for college in colleges %}
+                <option value="{{ college|escapejs }}">{{ college|escape }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="courseListContainer5">
+            <p>List of courses</p>
+        </div>
+
+        <div class="courseContainer5" style="display: flex; flex-wrap: wrap; gap: 2rem;">
+            {% for course in courses %}
+            <div class="subCourseContainer5 subCourse" style="width: 18rem;" data-college="{{ course.College|escapejs }}">
+                <div class="courseInfoContainer5">
+                    <div class="logoContainer5">
+                        <img 
+                            style="height: 90%;" 
+                            class="logo5" 
+                            src="{% static 'img/' %}{{ course.Logo|escapejs }}" 
+                            alt="{{ course.Course|escape }}">
+                    </div>
+
+                    <div class="courseNameContainer5">
+                        <p class="courseName5" style="width: 100%;">{{ course.Course|escape }}</p>
+                    </div>
+
+                    <div class="viewContainer5">
+                        <button 
+                            onclick="showCourseInfo(
+                                '{{ course.Course|escapejs }}', 
+                                '{{ course.CourseDescription|escapejs }}', 
+                                '{{ course.College|escapejs }}', 
+                                '{{ course.AvgGrade }}', 
+                                '{{ course.AvgCet }}', 
+                                '{% static 'img/' %}{{ course.Logo|escapejs }}'
+                            )" 
+                            class="viewButton5"
+                        >
+                            View
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div id="courseInfoModal" class="closeOpen5" style="display: none;">
+        <div class="subCourseInfoContainer5">
+            <div class="infoContainer5" >
+                <div class="textContainer5">
+                    <p>Course Information</p>
+                </div>
+
+                <div class="rotate">
+                    <div class="logoContainer6">
+                        <img style="width: 90%;" id="courseLogo" class="logo6" src="" alt="Course Logo">
+
+                        <div class="background">
+                            
+                        </div>
+                    </div>
+
+                    <div class="information">
+                        <div class="descriptionContainer5">
+                            <div class="labelContainer">
+                                <p>College:</p>
+                            </div>
+                            <div class="description6">
+                                <p id="college"></p>
+                            </div>
+                        </div>
+            
+                        <div class="descriptionContainer5">
+                            <div class="labelContainer">
+                                <p>Course:</p>
+                            </div>
+                            <div class="description6">
+                                <p id="courseName"></p>
+                            </div>
+                        </div>
+
+                        <div class="average">
+                            <div class="descriptionContainer5">
+                                <div class="labelContainer">
+                                    <p>Grade Average:</p>
+                                </div>
+                                <div class="description6">
+                                    <p id="avgGrade"></p>
+                                </div>
+                            </div>
+
+                            <div class="descriptionContainer5">
+                                <div class="labelContainer">
+                                    <p>CET Average:</p>
+                                </div>
+                                <div class="description6">
+                                    <p id="avgCet"></p>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div class="descriptionContainer5">
+                            <div class="labelContainer">
+                                <p>Description:</p>
+                            </div>
+                            <div class="description5">
+                                <p id="courseDescription"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="closeContainer5">
+                    <button onclick="closeCourseInfo()" class="closeButton5">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="addListContainer" id="addToListForm" style="display: none; position: fixed;">
+        <div class="addListContainer">
+            <div class="subAddListContainer">
+                <div class="closeContainer" style="margin-bottom: 1rem;">
+                    <div class="subCloseContainer">
+                        <img 
+                            onclick="closeAddListForm()" 
+                            class="closeButton1" 
+                            style="height: 2rem;" 
+                            src="{% static 'img/Screenshot 2024-07-17 221356.png' %}" 
+                            alt="Close"
+                        >
+                    </div>
+                    
+                    <div style="
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.6rem;
+                    font-weight: bold;
+                    padding-right: 3rem;">
+                        <p>Student Information</p>
+                    </div>
+                </div>
+
+                <form id="addListForm">
+                    <div class="infoContainer">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        <div class="subInfoContainer">
+                            <input class="info" name="first_name" type="text" required placeholder="Enter your first name">
+                        </div>
+                        
+                        <div class="subInfoContainer">
+                            <input class="info" name="middle_name" type="text" required placeholder="Enter your full middle name (Optional)">
+                        </div>
+                        
+                        <div class="subInfoContainer">
+                            <input class="info" name="last_name" type="text" required placeholder="Enter your last name">
+                        </div>
+
+                        <div class="subInfoContainer">
+                            <input class="info" name="email" type="email" required placeholder="Enter your email">
+                        </div>
+
+                        <div class="subInfoContainer">
+                            <input class="info" name="ApplicationNo" type="text" required placeholder="Enter your CET application no.:">
+                        </div>
+
+                        <div class="subInfoContainer">
+                            <input class="info" name="contact_no" type="number" required placeholder="Enter your contact no.:">
+                        </div>
+
+                        <div class="subInfoContainer">
+                            <input class="info" name="address" type="text" required placeholder="Enter your address">
+                        </div>
+
+                        <div class="subInfoContainer" style="gap: 1rem;">
+                            <input class="info" name="avg_grade" type="number" required style="width: 10rem;" placeholder="Enter grade avg:">
+                            <input class="info" name="avg_cet" type="number" required style="width: 10rem;" placeholder="Enter CET overall:">
+                        </div>
+
+                        <div class="subInfoContainer">
+                            <textarea disabled class="info" name="course" id="courseInput" type="text" required placeholder="Course" style="overflow: auto; min-height: 3rem;"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="buttonContainer">
+                        <button type="button" style="margin-right: 0.5rem;" class="closeButton5" onclick="submitAddToList()">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/exploreCourses.js' %}"></script>
+    <script>
+        function filterCourses() {
+            const selectedCollege = document.getElementById('collegeSelect').value;
+            const courses = document.querySelectorAll('.subCourse');
+
+            courses.forEach(course => {
+                if (selectedCollege === 'all' || course.getAttribute('data-college') === selectedCollege) {
+                    course.style.display = 'block';
+                } else {
+                    course.style.display = 'none';
+                }
+            });
+        }
+
+        function showAllCourses() {
+            const courses = document.querySelectorAll('.subCourse');
+            courses.forEach(course => course.style.display = 'block');
+            document.getElementById('collegeSelect').value = 'all';
+        }
+
+        function showCourseInfo(courseName, courseDescription, college, avgGrade, avgCet, logoSrc) {
+            selectedCourse = courseName; 
+            document.getElementById('courseName').innerText = courseName;
+            document.getElementById('courseDescription').innerText = courseDescription;
+            document.getElementById('college').innerText = college;
+            document.getElementById('avgGrade').innerText = avgGrade;
+            document.getElementById('avgCet').innerText = avgCet;
+
+            document.getElementById('courseLogo').src = logoSrc;
+
+            document.getElementById('courseInfoModal').style.display = 'block';
+            document.getElementById('courseInput').value = courseName; 
+        }
+
+        function closeCourseInfo() {
+            document.getElementById('courseInfoModal').style.display = 'none';
+        }
+
+        function closeAddListForm() {
+            document.getElementById('addToListForm').style.display = 'none';
+            clearForm();
+        }
+
+        function clearForm() {
+            const form = document.getElementById('addListForm');
+            form.reset(); 
+            document.getElementById('courseInput').value = selectedCourse; 
+        }
+
+        function viewCourse(courseName) {
+            document.getElementById('courseInput').value = courseName;
+        }
+
+        function submitAddToList() {
+            const form = document.getElementById('addListForm');
+            const formData = new FormData(form);
+
+            const selectedCourse = document.getElementById('courseInput').value;
+            formData.append('course', selectedCourse); 
+
+            fetch('{% url "exploreCourses" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);  
+                    closeAddListForm(); 
+                } else {
+                    alert('Please input all the information.');  
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.'); 
+            });
+        }
+    </script>
+</body>
+</html>

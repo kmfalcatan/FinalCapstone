@@ -1,0 +1,214 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Head Panel</title>
+
+    <link rel="stylesheet" href="/Capstone/static/css/dashboardAdmin.css">
+    <link rel="stylesheet" href="{% static 'css/dashboardAdmin.css' %}">
+</head>
+<body style="background-color: rgb(240,240,240);">
+    <div class="container" style="background-color: rgb(240,240,240);">
+        <div class="headerContainer">
+            <div class='menubarContainer' onclick='toggleMenu(this)'>
+                <div class='line' style="border: solid rgb(72,72,72) 2px;"></div>
+                <div class='line' style="border: solid rgb(72,72,72) 2px;"></div>
+                <div class='line' style="border: solid rgb(72,72,72) 2px;"></div>
+            </div>
+        </div>
+
+        <div style="background-color: rgb(240,240,240);" class="subMenubarContainer">
+            <a href="{% url 'dashboardTeacher' %}">
+                <div class="barContainer">
+                    <p>Dashboard</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'teacherPanel' %}">
+                <div class="barContainer">
+                    <p>List of students</p>
+                </div>
+            </a>
+
+            <a href="{% url 'approved_students' %}">
+                <div class="barContainer">
+                    <p>Approve</p>
+                </div>
+            </a>
+
+            <a href="{% url 'teacherCourses' %}">
+                <div class="barContainer">
+                    <p>Courses</p>
+                </div>
+            </a>
+    
+            <a href="{% url 'setting' %}">
+                <div class="barContainer">
+                    <p>Setting</p>
+                </div>
+            </a>
+
+            <a href="{% url 'logout' %}">
+                <div class="barContainer1">
+                    <p>Logout</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="filterContainer">
+            <div class="textContainer">
+                <p style="color: rgb(72,72,72);">Dashboard</p>
+            </div>
+        </div>
+
+        <div class="dashboardContainer">
+            <div class="subContainer5">
+                <div class="subDashboardContainer">
+                    <div class="numberContainer">
+                        <div class="nameContainer">
+                            <p>Approve Student</p>
+                        </div>
+    
+                        <div class="subNumberContainer">
+                            <p>{{ status_summary.Approved }}</p>
+                        </div>
+                    </div>
+    
+                    <div class="numberContainer">
+                        <div class="nameContainer">
+                            <p>Decline Student</p>
+                        </div>
+    
+                        <div class="subNumberContainer">
+                            <p>{{ status_summary.Declined }}</p>
+                        </div>
+                    </div>
+    
+                    <div class="numberContainer">
+                        <div class="nameContainer">
+                            <p>Pending Student</p>
+                        </div>
+    
+                        <div class="subNumberContainer">
+                            <p>{{ status_summary.Pending }}</p>
+                        </div>
+                    </div>
+    
+                    <div class="numberContainer">
+                        <div class="nameContainer">
+                            <p>Total of Students</p>
+                        </div>
+
+                        <div class="subNumberContainer">
+                            <p>{{ total_students }}</p> 
+                        </div>
+                    </div>                    
+                </div>
+    
+                <div class="graphContainer">
+                    <div class="subGraphContainer">
+                        <div class="nameContainer">
+                            <p>Students Status</p>
+                        </div>
+
+                        <div class="graph" style="height: 18rem; width: 100%; align-items: center;">
+                            <canvas id="studentsGraph" style="width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tableContainer">
+                <div class="subTableContainer">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if pending_students %}
+                                {% for student in pending_students %}
+                                    <tr>
+                                        <td><img src="{% static 'img/person.png' %}" alt=""></td>
+                                        <td>{{ student.Name }}</td> 
+                                        <td>{{ student.Course }}</td>
+                                        <td>{{ student.Status }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4">No pending students found.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>                        
+                    </table>
+                </div>
+            </div>            
+        </div>
+    </div>
+    <script src="{% static 'js/exploreCourses.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const graphData = JSON.parse('{{ graph_data|escapejs }}');
+    
+            const data = {
+                labels: graphData.years, 
+                datasets: [{
+                    label: 'Total Students',
+                    data: graphData.total_students,
+                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                    borderColor: 'rgb(255, 255, 255)',
+                    borderWidth: 1,
+                }]
+            };
+    
+            const config = {
+                type: 'bar', 
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white' 
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'white' 
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.2)' 
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: 'white' 
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.2)' 
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            };
+    
+            const studentsGraph = new Chart(
+                document.getElementById('studentsGraph'),
+                config
+            );
+        });
+    </script>
+</body>
+</html>
